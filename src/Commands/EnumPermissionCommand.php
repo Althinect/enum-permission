@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Althinect\EnumPermission\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class EnumPermissionCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'enum-permission';
 
     public $description = 'My command';
 
