@@ -1,5 +1,5 @@
 
-# About
+# Althinect Enum Permission
 
 The **Althinect Enum Permission** package helps in generating Permission Enums for models in your application. It also provides an option to generate policy files for models as well as models that do not exist.
 
