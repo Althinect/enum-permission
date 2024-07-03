@@ -4,88 +4,42 @@ namespace App\Policies;
 
 use {{userModel}};
 use {{model}};
+use {{permissionEnum}};
 
 class {{policyName}}
 {
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return mixed
-     */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
-        // Your logic here
+        return $user->hasPermissionTo({{permissionEnumName}}::VIEW_ANY->value);
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\YourModel  $yourModel
-     * @return mixed
-     */
-    public function view(User $user, {{modelName}} ${{modelVariable}})
+    public function view(User $user, {{modelName}} ${{modelVariable}}): bool
     {
-        // Your logic here
+        return $user->hasPermissionTo({{permissionEnumName}}::VIEW->value);
     }
 
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return mixed
-     */
     public function create(User $user)
     {
-        // Your logic here
+        return $user->hasPermissionTo({{permissionEnumName}}::CREATE->value);
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\YourModel  $yourModel
-     * @return mixed
-     */
-    public function view(User $user, {{modelName}} ${{modelVariable}})
+    public function update(User $user, {{modelName}} ${{modelVariable}}): bool
     {
-        // Your logic here
+        return $user->hasPermissionTo({{permissionEnumName}}::UPDATE->value);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\YourModel  $yourModel
-     * @return mixed
-     */
-    public function delete(User $user, {{modelName}} ${{modelVariable}})
+    public function delete(User $user, {{modelName}} ${{modelVariable}}): bool
     {
-        // Your logic here
+        return $user->hasPermissionTo({{permissionEnumName}}::DELETE->value);
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\YourModel  $yourModel
-     * @return mixed
-     */
-    public function restore(User $user, {{modelName}} ${{modelVariable}})
+    public function restore(User $user, {{modelName}} ${{modelVariable}}): bool
     {
-        // Your logic here
+        return $user->hasPermissionTo({{permissionEnumName}}::RESTORE->value);
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\YourModel  $yourModel
-     * @return mixed
-     */
-    public function forceDelete(User $user, {{modelName}} ${{modelVariable}})
+    public function forceDelete(User $user, {{modelName}} ${{modelVariable}}): bool
     {
-        // Your logic here
+        return $user->hasPermissionTo({{permissionEnumName}}::FORCE_DELETE->value);
     }
 }
