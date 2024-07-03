@@ -1,84 +1,129 @@
-# This package is to create permissions with enums
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/althinect/enum-permission.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/althinect/enum-permission/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/althinect/enum-permission/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/althinect/enum-permission/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/althinect/enum-permission/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/althinect/enum-permission.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
+```markdown
+# About
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/enum-permission.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/enum-permission)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+The `EnumPermissionCommand` is a Laravel Artisan command that helps in generating Permission Enums for models in your application. It also provides an option to generate policy files for models as well as models that do not exist.
 
 ## Installation
 
-You can install the package via composer:
+1. Require the package using Composer:
+    ```sh
+    composer require althinect/enum-permission
+    ```
 
-```bash
-composer require althinect/enum-permission
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="enum-permission-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="enum-permission-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="enum-permission-views"
-```
+2. Publish the configuration file:
+    ```sh
+    php artisan vendor:publish --provider="Althinect\EnumPermission\EnumPermissionServiceProvider"
+    ```
 
 ## Usage
 
+The command can be used to generate permission enums for a specific model or multiple models. Additionally, it can create new models if they don't exist and generate associated migration, factory, and seeder files.
+
+### Generate Permission Enum for a Specific Model
+
+To generate a permission enum for a specific model, run the following command:
+
+```sh
+php artisan model-permission {ModelName}
+```
+
+Replace `{ModelName}` with the name of your model. For example:
+
+```sh
+php artisan model-permission User
+```
+
+### Generate Permission Enum for Multiple Models
+
+If you don't specify a model name, the command will prompt you to select from a list of available models:
+
+```sh
+php artisan model-permission
+```
+
+You can select multiple models from the list or choose `all` to generate permission enums for all models.
+
+### Create a New Model
+
+If the specified model does not exist, the command will prompt you to create a new model and generate the permission enum for it. You will also be prompted to create migration, factory, and seeder files for the new model.
+
+### Generate Policy Files
+
+You can use the `--policy` option to generate policy files for the models:
+
+```sh
+php artisan model-permission {ModelName} --policy
+```
+
+### Options
+
+- `name`: The name of the model for which you want to generate the permission enum.
+- `--policy` or `-P`: Generate a policy file for the specified model.
+
+### Prompts
+
+The command will prompt you for the following:
+
+- Whether to create a new model if the specified model does not exist.
+- Whether to create migration, factory, and seeder files for the new model.
+- Whether to overwrite existing permission enum and policy files if they already exist.
+
+## Configuration
+
+The configuration file `config/enum-permission.php` allows you to define the following:
+
+- `models_path`: The directory path where your models are stored.
+- `permissions_cases`: An array defining the permission cases for the enums.
+- `user_model`: The fully qualified class name of your User model.
+
+Example configuration:
+
 ```php
-$enumPermission = new Althinect\EnumPermission();
-echo $enumPermission->echoPhrase('Hello, Althinect!');
+return [
+    'models_path' => 'Models',
+    'permissions_cases' => [
+        'view' => '{{ ModelName }}View',
+        'create' => '{{ ModelName }}Create',
+        'update' => '{{ ModelName }}Update',
+        'delete' => '{{ ModelName }}Delete',
+    ],
+    'user_model' => App\Models\User::class,
+];
 ```
 
-## Testing
+## Stubs
 
-```bash
-composer test
+The command uses stub files to generate the permission enums and policy files. These stubs are located in the `vendor/althinect/enum-permission/src/stubs` directory.
+
+- `permission.stub`: The stub file for generating permission enums.
+- `policy.stub`: The stub file for generating policy files.
+
+You can customize these stubs according to your needs.
+
+## Examples
+
+### Example: Generating Permission Enum for User Model
+
+```sh
+php artisan model-permission User
 ```
 
-## Changelog
+### Example: Generating Permission Enum and Policy for Post Model
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+```sh
+php artisan model-permission Post --policy
+```
 
-## Contributing
+### Example: Creating a New Model and Generating Permission Enum
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+```sh
+php artisan model-permission NewModel
+```
 
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [Tharinda Rodrigo](https://github.com/tharindarodrigo)
-- [All Contributors](../../contributors)
+You will be prompted to create the model, migration, factory, and seeder files.
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+This package is open-source software licensed under the [MIT license](LICENSE).
+```
