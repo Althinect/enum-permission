@@ -1,8 +1,7 @@
 
-```markdown
 # About
 
-The `EnumPermissionCommand` is a Laravel Artisan command that helps in generating Permission Enums for models in your application. It also provides an option to generate policy files for models as well as models that do not exist.
+The **Althinect Enum Permission** package helps in generating Permission Enums for models in your application. It also provides an option to generate policy files for models as well as models that do not exist.
 
 ## Installation
 
@@ -81,14 +80,19 @@ Example configuration:
 
 ```php
 return [
-    'models_path' => 'Models',
+    'models_path' => 'Domains',
+    'enum_path_should_follow_models_path' => true,
+    'user_model' => 'App\Models\User',
+
     'permissions_cases' => [
-        'view' => '{{ ModelName }}View',
-        'create' => '{{ ModelName }}Create',
-        'update' => '{{ ModelName }}Update',
-        'delete' => '{{ ModelName }}Delete',
+        'VIEW_ANY' => '{{ ModelName }}.viewAny',
+        'VIEW' => '{{ ModelName }}.view',
+        'CREATE' => '{{ ModelName }}.create',
+        'UPDATE' => '{{ ModelName }}.update',
+        'DELETE' => '{{ ModelName }}.delete',
+        'RESTORE' => '{{ ModelName }}.restore',
+        'FORCE_DELETE' => '{{ ModelName }}.forceDelete',
     ],
-    'user_model' => App\Models\User::class,
 ];
 ```
 
@@ -126,4 +130,4 @@ You will be prompted to create the model, migration, factory, and seeder files.
 ## License
 
 This package is open-source software licensed under the [MIT license](LICENSE).
-```
+
