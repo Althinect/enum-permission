@@ -2,6 +2,4 @@
 
 namespace Althinect\EnumPermission;
 
-class EnumPermission
-{
-}
+class EnumPermission {}

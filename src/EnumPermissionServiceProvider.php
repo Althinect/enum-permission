@@ -2,9 +2,9 @@
 
 namespace Althinect\EnumPermission;
 
+use Althinect\EnumPermission\Commands\EnumPermissionCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Althinect\EnumPermission\Commands\EnumPermissionCommand;
 
 class EnumPermissionServiceProvider extends PackageServiceProvider
 {

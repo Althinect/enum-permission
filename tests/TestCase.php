@@ -2,9 +2,9 @@
 
 namespace Althinect\EnumPermission\Tests;
 
+use Althinect\EnumPermission\EnumPermissionServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Althinect\EnumPermission\EnumPermissionServiceProvider;
 
 class TestCase extends Orchestra
 {
