@@ -8,38 +8,5 @@ use {{permissionEnum}};
 
 class {{policyName}}
 {
-    public function viewAny(User $user): bool
-    {
-        return $user->hasPermissionTo({{permissionEnumName}}::VIEW_ANY->value);
-    }
-
-    public function view(User $user, {{modelName}} ${{modelVariable}}): bool
-    {
-        return $user->hasPermissionTo({{permissionEnumName}}::VIEW->value);
-    }
-
-    public function create(User $user)
-    {
-        return $user->hasPermissionTo({{permissionEnumName}}::CREATE->value);
-    }
-
-    public function update(User $user, {{modelName}} ${{modelVariable}}): bool
-    {
-        return $user->hasPermissionTo({{permissionEnumName}}::UPDATE->value);
-    }
-
-    public function delete(User $user, {{modelName}} ${{modelVariable}}): bool
-    {
-        return $user->hasPermissionTo({{permissionEnumName}}::DELETE->value);
-    }
-
-    public function restore(User $user, {{modelName}} ${{modelVariable}}): bool
-    {
-        return $user->hasPermissionTo({{permissionEnumName}}::RESTORE->value);
-    }
-
-    public function forceDelete(User $user, {{modelName}} ${{modelVariable}}): bool
-    {
-        return $user->hasPermissionTo({{permissionEnumName}}::FORCE_DELETE->value);
-    }
+{{methods}}
 }

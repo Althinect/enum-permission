@@ -2,6 +2,7 @@
 
 namespace Althinect\EnumPermission\Commands;
 
+use Althinect\EnumPermission\Concerns\Helpers;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
@@ -14,13 +15,14 @@ use function Laravel\Prompts\select;
 
 class EnumPermissionCommand extends Command
 {
-    public $signature = 'model-permission {name?} {--P|policy}';
+    use Helpers;
+    public $signature = 'permission:make {modelName?} {--P|policy}';
 
     public $description = 'Generate Permissions Enum';
 
     public function handle(): int
     {
-        $model = $this->argument('name');
+        $model = $this->argument('modelName');
 
         if ($model !== null) {
             $allModels = $this->getAllModels();
@@ -64,7 +66,7 @@ class EnumPermissionCommand extends Command
                 options: ['yes', 'no'],
             ) === 'yes';
 
-            $modelOptions['--seed'] = select(
+            $modelOptions['--seeder'] = select(
                 required: true,
                 label: 'Do you want to create a seeder for the model?',
                 options: ['yes', 'no'],
@@ -111,7 +113,7 @@ class EnumPermissionCommand extends Command
             $permissionEnumPath = str_replace('.php', 'Permission.php', $modelPath);
 
             $permissionStub = File::get('vendor/althinect/enum-permission/src/stubs/permission.stub');
-            $permissionEnum = str_replace(['{{cases}}', '{{enumName}}', '{{namespace}}'], [$permissionCases, $modelName.'Permission', $namespace], $permissionStub);
+            $permissionEnum = str_replace(['{{cases}}', '{{enumName}}', '{{namespace}}'], [$permissionCases, $modelName.'Permission', $namespace], $permissionStub);        
 
             File::ensureDirectoryExists(dirname($permissionEnumPath));
 
@@ -153,19 +155,45 @@ class EnumPermissionCommand extends Command
     {
         $policyStub = File::get('vendor/althinect/enum-permission/src/stubs/policy.stub');
         $modelName = class_basename($model);
-        $namespace = (new ReflectionClass($model))->getNamespaceName();
+        $namespace = (new ReflectionClass(objectOrClass: $model))->getNamespaceName();
         $modelVariable = lcfirst($modelName);
         $policyName = $modelName.'Policy';
         $userModel = config('enum-permission.user_model');
         $permissionEnumName = $modelName.'Permission';
-        $permissionEnum = $permissionNamespace.'\\'.$permissionEnumName;
+        $permissionEnum = $permissionNamespace.'\\'.$permissionEnumName;        
 
+        $permissions = config('enum-permission.permissions');
+        $methods = '';
+        
         $policy = str_replace(
-            ['{{namespace}}', '{{modelName}}', '{{userModel}}', '{{permissionEnum}}', '{{permissionEnumName}}', '{{policyName}}', '{{model}}', '{{modelVariable}}'],
-            [$namespace, $modelName, $userModel, $permissionEnum, $permissionEnumName, $policyName, $model, $modelVariable],
+            ['{{namespace}}', '{{modelName}}', '{{permissionEnum}}', '{{policyName}}', '{{model}}', '{{modelVariable}}'],
+            [$namespace, $modelName, $permissionEnum, $policyName, $model, $modelVariable],
             $policyStub
         );
 
+        foreach ($permissions as $permission) {
+            $arguments = implode(', ', $permission['arguments']);
+            $enumCase = $permission['enum_case'];
+            $enumValue = $permission['enum_value'];
+
+            $policyMethodStructure = $this->getPolicyMethodStructure();        
+
+            $methods .= str_replace(
+                ['{{method}}', '{{arguments}}', '{{enumValue}}', '{{enumCase}}'],
+                [$permission['method'], $arguments, $enumValue, $enumCase],
+                $policyMethodStructure
+            );
+        }
+        $policy = str_replace('{{methods}}', $methods, $policy);
+        
+        $userModelName = class_basename($userModel);
+        
+        $policy = str_replace(
+            ['{{userModel}}', '{{userModelName}}', '{{modelName}}', '{{permissionEnumName}}'],
+            [$userModel, $userModelName, $modelName, $permissionEnumName],
+            $policy
+        );
+        
         $policyPath = app_path('App/Policies/'.$policyName.'.php');
         File::ensureDirectoryExists(dirname($policyPath));
 
@@ -193,9 +221,13 @@ class EnumPermissionCommand extends Command
 
     private function getAllModels(): array
     {
-        return array_filter($this->getClassesInDirectory(app_path(config('enum-permission.models_path'))), function ($model) {
+        $models = array_filter($this->getClassesInDirectory(app_path(config('enum-permission.models_path'))), function ($model) {
             return $model->isSubclassOf(Model::class) || $model->isSubclassOf(Authenticatable::class);
         });
+
+        return $models = array_map(function ($model) {
+            return $model->getName();
+        }, $models);
     }
 
     private function getClassesInDirectory($path): array
@@ -234,15 +266,28 @@ class EnumPermissionCommand extends Command
 
     private function getPermissionsStringCasesForEnum($model): string
     {
-        $permissions = config('enum-permission.permissions_cases');
+        $permissions = config('enum-permission.permissions');
         $cases = '';
 
         $modelName = class_basename($model);
 
-        foreach ($permissions as $permission => $case) {
-            $cases .= '    case '.$permission.' = \''.str_replace('{{ ModelName }}', $modelName, $case).'\';'.PHP_EOL;
+        foreach ($permissions as $permission) {
+            $enumCase = $permission['enum_case'];
+            $enumValue = $permission['enum_value'];
+            $cases .= '    case '.$enumCase.' = \''.$enumValue.'\';'.PHP_EOL;
+
+            $cases = str_replace('{{modelName}}', $modelName, $cases);
         }
 
         return $cases;
+    }
+
+    private function getPolicyMethodStructure(): string
+    {
+        return
+    '    public function {{method}}({{arguments}}): bool'.PHP_EOL.
+        '    {'.PHP_EOL.
+        '        return $user->hasPermissionTo({{permissionEnumName}}::{{enumCase}});'.PHP_EOL.
+        '    }'.PHP_EOL.PHP_EOL;
     }
 }

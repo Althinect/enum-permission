@@ -3,6 +3,7 @@
 namespace Althinect\EnumPermission;
 
 use Althinect\EnumPermission\Commands\EnumPermissionCommand;
+use Althinect\EnumPermission\Commands\SyncPermissionCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -20,6 +21,7 @@ class EnumPermissionServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasMigration('create_enum-permission_table')
-            ->hasCommand(EnumPermissionCommand::class);
+            ->hasCommand(EnumPermissionCommand::class)
+            ->hasCommand(SyncPermissionCommand::class);
     }
 }

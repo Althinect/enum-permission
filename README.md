@@ -1,133 +1,138 @@
+# Laravel Enum Permissions
 
-# Althinect Enum Permission
+A Laravel package that generates and manages permissions using PHP enums, making permission handling more type-safe and maintainable.
 
-The **Althinect Enum Permission** package helps in generating Permission Enums for models in your application. It also provides an option to generate policy files for models as well as models that do not exist.
+## Requirements
+
+- PHP 8.1 or higher
+- Laravel 10.0 or higher
 
 ## Installation
 
-1. Require the package using Composer:
-    ```sh
-    composer require althinect/enum-permission
-    ```
-
-2. Publish the configuration file:
-    ```sh
-    php artisan vendor:publish --provider="Althinect\EnumPermission\EnumPermissionServiceProvider"
-    ```
-
-## Usage
-
-The command can be used to generate permission enums for a specific model or multiple models. Additionally, it can create new models if they don't exist and generate associated migration, factory, and seeder files.
-
-### Generate Permission Enum for a Specific Model
-
-To generate a permission enum for a specific model, run the following command:
-
-```sh
-php artisan model-permission {ModelName}
+```bash
+composer require althinect/enum-permission
 ```
-
-Replace `{ModelName}` with the name of your model. For example:
-
-```sh
-php artisan model-permission User
-```
-
-### Generate Permission Enum for Multiple Models
-
-If you don't specify a model name, the command will prompt you to select from a list of available models:
-
-```sh
-php artisan model-permission
-```
-
-You can select multiple models from the list or choose `all` to generate permission enums for all models.
-
-### Create a New Model
-
-If the specified model does not exist, the command will prompt you to create a new model and generate the permission enum for it. You will also be prompted to create migration, factory, and seeder files for the new model.
-
-### Generate Policy Files
-
-You can use the `--policy` option to generate policy files for the models:
-
-```sh
-php artisan model-permission {ModelName} --policy
-```
-
-### Options
-
-- `name`: The name of the model for which you want to generate the permission enum.
-- `--policy` or `-P`: Generate a policy file for the specified model.
-
-### Prompts
-
-The command will prompt you for the following:
-
-- Whether to create a new model if the specified model does not exist.
-- Whether to create migration, factory, and seeder files for the new model.
-- Whether to overwrite existing permission enum and policy files if they already exist.
 
 ## Configuration
 
-The configuration file `config/enum-permission.php` allows you to define the following:
+Publish the configuration file:
 
-- `models_path`: The directory path where your models are stored.
-- `permissions_cases`: An array defining the permission cases for the enums.
-- `user_model`: The fully qualified class name of your User model.
+```bash
+php artisan vendor:publish --tag="enum-permission-config"
+```
 
-Example configuration:
+The configuration file will be published to `config/enum-permission.php`.
+
+### Configuration Options
 
 ```php
 return [
-    'models_path' => 'Domains',
-    'enum_path_should_follow_models_path' => true,
-    'user_model' => 'App\Models\User',
-
-    'permissions_cases' => [
-        'VIEW_ANY' => '{{ ModelName }}.viewAny',
-        'VIEW' => '{{ ModelName }}.view',
-        'CREATE' => '{{ ModelName }}.create',
-        'UPDATE' => '{{ ModelName }}.update',
-        'DELETE' => '{{ ModelName }}.delete',
-        'RESTORE' => '{{ ModelName }}.restore',
-        'FORCE_DELETE' => '{{ ModelName }}.forceDelete',
-    ],
+    'models_path' => 'Models', // Path to your models
+    'user_model' => \App\Models\User::class, // Your User model
+    'permissions' => [
+        [
+            'method' => 'viewAny',
+            'arguments' => ['User $user'],
+            'enum_case' => 'VIEW_ANY',
+            'enum_value' => '{{modelName}}.viewAny'
+        ],
+        // ... other permissions
+    ]
 ];
 ```
 
-## Stubs
+## Usage
 
-The command uses stub files to generate the permission enums and policy files. These stubs are located in the `vendor/althinect/enum-permission/src/stubs` directory.
+### Generating Permission Enums
 
-- `permission.stub`: The stub file for generating permission enums.
-- `policy.stub`: The stub file for generating policy files.
+```bash
+# Generate for a specific model
+php artisan permission:make User
 
-You can customize these stubs according to your needs.
+# Generate with policy
+php artisan permission:make User --policy
+
+# Interactive selection of models
+php artisan permission:make
+```
+
+### Syncing Permissions to Database
+
+```bash
+# Sync all permissions
+php artisan permission:sync
+
+# Clean existing permissions before sync
+php artisan permission:sync --clean
+```
+
+### Using Generated Permissions
+
+```php
+// In your policies
+public function view(User $user, Post $post): bool
+{
+    return $user->hasPermissionTo(PostPermission::VIEW);
+}
+```
+
+## Directory Structure
+
+After generation, your files will be organized as follows:
+
+```
+app/
+├── Models/
+│   └── User.php
+├── Permissions/
+│   └── UserPermission.php
+└── Policies/
+    └── UserPolicy.php
+```
+
+## Available Commands
+
+- `permission:make {model?} {--P|policy}` - Generate permission enums
+- `permission:sync {--C|clean}` - Sync permissions to database
 
 ## Examples
 
-### Example: Generating Permission Enum for User Model
+### Generated Permission Enum
 
-```sh
-php artisan model-permission User
+```php
+namespace App\Permissions;
+
+enum UserPermission: string
+{
+    case VIEW_ANY = 'User.viewAny';
+    case VIEW = 'User.view';
+    case CREATE = 'User.create';
+    case UPDATE = 'User.update';
+    case DELETE = 'User.delete';
+    case RESTORE = 'User.restore';
+    case FORCE_DELETE = 'User.forceDelete';
+}
 ```
 
-### Example: Generating Permission Enum and Policy for Post Model
+### Using with Policies
 
-```sh
-php artisan model-permission Post --policy
+```php
+use App\Permissions\UserPermission;
+
+class UserPolicy
+{
+    public function view(User $user, User $model): bool
+    {
+        return $user->hasPermissionTo(UserPermission::VIEW);
+    }
+}
 ```
 
-### Example: Creating a New Model and Generating Permission Enum
+## Contributing
 
-```sh
-php artisan model-permission NewModel
-```
-
-You will be prompted to create the model, migration, factory, and seeder files.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This package is open-source software licensed under the [MIT license](LICENSE).
+This package is open-source software licensed under the MIT license.
 
