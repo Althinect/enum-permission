@@ -3,21 +3,19 @@
 namespace Althinect\EnumPermission\Commands;
 
 use Althinect\EnumPermission\Concerns\Helpers;
-use Illuminate\Auth\Authenticatable;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
 use ReflectionException;
 
-use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 
 class SyncPermissionCommand extends Command
 {
     use Helpers;
+
     public $signature = 'permission:sync {--C|clean}';
 
     public $description = 'Sync Permissions to the DB';
@@ -43,30 +41,31 @@ class SyncPermissionCommand extends Command
         }
 
         foreach ($permissionFiles as $permissionFile) {
-            
-            $permissionClass = $this->extractNamespace($permissionFile->getPathname()) . '\\' . $permissionFile->getBasename('.php');
+
+            $permissionClass = $this->extractNamespace($permissionFile->getPathname()).'\\'.$permissionFile->getBasename('.php');
 
             $this->info("Processing {$permissionClass}");
 
-            if (!$this->isEnumClass($permissionClass)) {
-                $this->danger("Class is not an Enum class");
+            if (! $this->isEnumClass($permissionClass)) {
+                $this->danger('Class is not an Enum class');
+
                 continue;
             }
-           
+
             $cases = $permissionClass::cases();
 
-            $guards = array_keys(config('auth.guards'));        
-            
-            foreach($guards as $guard) {
-                foreach($cases as $case) {
+            $guards = array_keys(config('auth.guards'));
+
+            foreach ($guards as $guard) {
+                foreach ($cases as $case) {
                     $this->call('permission:create-permission', [
                         'name' => $case->value,
-                        'guard' => $guard
+                        'guard' => $guard,
                     ]);
                 }
             }
         }
-        
+
         return self::SUCCESS;
 
     }
@@ -75,6 +74,7 @@ class SyncPermissionCommand extends Command
     {
         try {
             $reflection = new ReflectionClass($classPath);
+
             return $reflection->isEnum();
         } catch (ReflectionException $e) {
             return false;
@@ -85,20 +85,17 @@ class SyncPermissionCommand extends Command
     {
         $permissionClasses = [];
         $files = File::allFiles(app_path());
-    
+
         //Search all the Enum files that are Suffixed with Permission
         foreach ($files as $file) {
             $fileName = $file->getFilename();
             $fileExtension = $file->getExtension();
-    
-            if ($fileExtension === 'php' && strpos($fileName, 'Permission') !== false ){
+
+            if ($fileExtension === 'php' && strpos($fileName, 'Permission') !== false) {
                 $permissionClasses[] = $file;
             }
         }
 
         return $permissionClasses;
     }
-
-
-
 }

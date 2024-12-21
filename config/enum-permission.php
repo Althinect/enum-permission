@@ -48,7 +48,7 @@ return [
             'enum_case' => 'FORCE_DELETE',
             'enum_value' => '{{modelName}}.forceDelete',
         ],
-        
+
     ],
 
     'guards' => [

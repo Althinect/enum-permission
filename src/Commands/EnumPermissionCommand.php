@@ -16,6 +16,7 @@ use function Laravel\Prompts\select;
 class EnumPermissionCommand extends Command
 {
     use Helpers;
+
     public $signature = 'permission:make {modelName?} {--P|policy}';
 
     public $description = 'Generate Permissions Enum';
@@ -113,7 +114,7 @@ class EnumPermissionCommand extends Command
             $permissionEnumPath = str_replace('.php', 'Permission.php', $modelPath);
 
             $permissionStub = File::get('vendor/althinect/enum-permission/src/stubs/permission.stub');
-            $permissionEnum = str_replace(['{{cases}}', '{{enumName}}', '{{namespace}}'], [$permissionCases, $modelName.'Permission', $namespace], $permissionStub);        
+            $permissionEnum = str_replace(['{{cases}}', '{{enumName}}', '{{namespace}}'], [$permissionCases, $modelName.'Permission', $namespace], $permissionStub);
 
             File::ensureDirectoryExists(dirname($permissionEnumPath));
 
@@ -160,11 +161,11 @@ class EnumPermissionCommand extends Command
         $policyName = $modelName.'Policy';
         $userModel = config('enum-permission.user_model');
         $permissionEnumName = $modelName.'Permission';
-        $permissionEnum = $permissionNamespace.'\\'.$permissionEnumName;        
+        $permissionEnum = $permissionNamespace.'\\'.$permissionEnumName;
 
         $permissions = config('enum-permission.permissions');
         $methods = '';
-        
+
         $policy = str_replace(
             ['{{namespace}}', '{{modelName}}', '{{permissionEnum}}', '{{policyName}}', '{{model}}', '{{modelVariable}}'],
             [$namespace, $modelName, $permissionEnum, $policyName, $model, $modelVariable],
@@ -176,7 +177,7 @@ class EnumPermissionCommand extends Command
             $enumCase = $permission['enum_case'];
             $enumValue = $permission['enum_value'];
 
-            $policyMethodStructure = $this->getPolicyMethodStructure();        
+            $policyMethodStructure = $this->getPolicyMethodStructure();
 
             $methods .= str_replace(
                 ['{{method}}', '{{arguments}}', '{{enumValue}}', '{{enumCase}}'],
@@ -185,15 +186,15 @@ class EnumPermissionCommand extends Command
             );
         }
         $policy = str_replace('{{methods}}', $methods, $policy);
-        
+
         $userModelName = class_basename($userModel);
-        
+
         $policy = str_replace(
             ['{{userModel}}', '{{userModelName}}', '{{modelName}}', '{{permissionEnumName}}'],
             [$userModel, $userModelName, $modelName, $permissionEnumName],
             $policy
         );
-        
+
         $policyPath = app_path('App/Policies/'.$policyName.'.php');
         File::ensureDirectoryExists(dirname($policyPath));
 

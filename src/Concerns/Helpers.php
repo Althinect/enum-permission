@@ -2,9 +2,6 @@
 
 namespace Althinect\EnumPermission\Concerns;
 
-use ReflectionClass;
-use ReflectionException;
-
 trait Helpers
 {
     private function extractNamespace($file): string
