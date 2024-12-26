@@ -47,7 +47,7 @@ class SyncPermissionCommand extends Command
             $this->info("Processing {$permissionClass}");
 
             if (! $this->isEnumClass($permissionClass)) {
-                $this->danger('Class is not an Enum class');
+                $this->warn('Class is not an Enum class');
 
                 continue;
             }
