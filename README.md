@@ -1,6 +1,6 @@
 # Laravel Enum Permissions
 
-A Laravel package that generates and manages permissions using PHP enums, making permission handling more type-safe and maintainable.
+A Laravel package to easily generate enums using Models
 
 ## Requirements
 

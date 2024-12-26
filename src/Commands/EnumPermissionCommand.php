@@ -3,9 +3,7 @@
 namespace Althinect\EnumPermission\Commands;
 
 use Althinect\EnumPermission\Concerns\Helpers;
-use Illuminate\Auth\Authenticatable;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
 
@@ -222,8 +220,8 @@ class EnumPermissionCommand extends Command
 
     private function getAllModels(): array
     {
-        $models = array_filter($this->getClassesInDirectory(app_path(config('enum-permission.models_path'))), function ($model) {
-            return $model->isSubclassOf(Model::class) || $model->isSubclassOf(Authenticatable::class);
+        $models = array_filter($this->getClassesInDirectory(app_path(config('enum-permission.models_app_path'))), function ($model) {
+            return collect(config('enum-permission.model_super_classes'))->contains(fn ($superClass): mixed => $model->isSubclassOf($superClass));
         });
 
         return $models = array_map(function ($model) {
