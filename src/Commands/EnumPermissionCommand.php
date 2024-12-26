@@ -65,7 +65,7 @@ class EnumPermissionCommand extends Command
                 options: ['yes', 'no'],
             ) === 'yes';
 
-            $modelOptions['--seeder'] = select(
+            $modelOptions['--seed'] = select(
                 required: true,
                 label: 'Do you want to create a seeder for the model?',
                 options: ['yes', 'no'],
