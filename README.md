@@ -1,6 +1,7 @@
 # Laravel Enum Permissions
 
-A Laravel package to easily generate enums using Models
+A Laravel package to easily generate permission classes with enums using Models
+*** This package uses Spatie/Permissions under the hood ***
 
 ## Requirements
 
