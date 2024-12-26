@@ -2,6 +2,11 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.4 - 2024-12-26
+
+Seeder genenerator fixed
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.3...v0.1.4
+
 ## v0.1.3 - 2024-12-26
 
 ### What's Changed
