@@ -2,6 +2,14 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.8 - 2024-12-31
+
+### What's Changed
+
+* Update migration reference in EnumPermissionServiceProvider to add group column to permissions table by @tharindarodrigo in https://github.com/Althinect/enum-permission/pull/10
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.7...v0.1.8
+
 ## v0.1.7 - 2024-12-31
 
 Service Provider bugfix
