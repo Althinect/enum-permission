@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
 use ReflectionException;
-
 use Spatie\Permission\Models\Permission;
+
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 
@@ -61,10 +61,10 @@ class SyncPermissionCommand extends Command
                 foreach ($cases as $case) {
                     $permission = [
                         'name' => $case->value,
-                        'guard_name' => $guard,                    
+                        'guard_name' => $guard,
                     ];
 
-                    if (config('enum-permission.syncPermissionGroup'))  {
+                    if (config('enum-permission.syncPermissionGroup')) {
                         $permission['group'] = $permissionClass::getPermissionGroup();
                     }
 
