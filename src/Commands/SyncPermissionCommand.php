@@ -37,8 +37,8 @@ class SyncPermissionCommand extends Command
                 default: 'no'
             );
 
-            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            DB::table('permissions')->truncate();
+            DB::table('permissions')->delete();
+            DB::statement('ALTER SEQUENCE permissions_id_seq RESTART WITH 1;');
         }
 
         foreach ($permissionFiles as $permissionFile) {
