@@ -86,7 +86,7 @@ class SyncPermissionCommand extends Command
         $permissionClasses = [];
         $files = File::allFiles(app_path());
 
-        //Search all the Enum files that are Suffixed with Permission
+        // Search all the Enum files that are Suffixed with Permission
         foreach ($files as $file) {
             $fileName = $file->getFilename();
             $fileExtension = $file->getExtension();
