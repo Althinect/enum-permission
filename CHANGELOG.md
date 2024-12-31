@@ -2,6 +2,10 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.7 - 2024-12-31
+
+Service Provider bugfix
+
 ## v0.1.6 - 2024-12-31
 
 Add group column to permissions table
