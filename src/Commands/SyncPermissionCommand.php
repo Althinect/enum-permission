@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\File;
 use ReflectionClass;
 use ReflectionException;
 
+use Spatie\Permission\Models\Permission;
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 
@@ -58,16 +59,21 @@ class SyncPermissionCommand extends Command
 
             foreach ($guards as $guard) {
                 foreach ($cases as $case) {
-                    $this->call('permission:create-permission', [
+                    $permission = [
                         'name' => $case->value,
-                        'guard' => $guard,
-                    ]);
+                        'guard_name' => $guard,                    
+                    ];
+
+                    if (config('enum-permission.syncPermissionGroup'))  {
+                        $permission['group'] = $permissionClass::getPermissionGroup();
+                    }
+
+                    Permission::firstOrCreate($permission);
                 }
             }
         }
 
         return self::SUCCESS;
-
     }
 
     private function isEnumClass(string $classPath): bool

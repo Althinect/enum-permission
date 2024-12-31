@@ -1,8 +1,10 @@
 <?php
 
 namespace {{namespace}};
+namespace Althinect\EnumPermission\Concerns\HasPermissionGroup
 
 enum {{enumName}} : string
 {
+    use HasPermissionGroup;
 {{cases}}
 }

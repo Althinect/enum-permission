@@ -52,7 +52,7 @@ return [
             'method' => 'viewAny',
             'arguments' => ['{{userModelName}} $user'],
             'enum_case' => 'VIEW_ANY',
-            'enum_value' => '{{modelName}}.viewAny',
+            'enum_value' => '{{modelName}}.view-any',
         ],
         [
             'method' => 'view',
@@ -88,7 +88,7 @@ return [
             'method' => 'forceDelete',
             'arguments' => ['{{userModelName}} $user', '{{modelName}} $model'],
             'enum_case' => 'FORCE_DELETE',
-            'enum_value' => '{{modelName}}.forceDelete',
+            'enum_value' => '{{modelName}}.force-delete',
         ],
     ],
 
@@ -100,4 +100,13 @@ return [
         'web',
         'api',
     ],
+
+    // ---------------------------------------------------------------------------
+    // Sync Group Permissions
+    // This will add a group column to the permissions table and sync.
+    // This will help in grouping the permissions together
+    // The group is determined by the getPermissionGroup method in the Enum class
+    // ---------------------------------------------------------------------------
+
+    'syncPermissionGroup' => true,
 ];

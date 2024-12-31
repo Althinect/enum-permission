@@ -8,12 +8,8 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('enum_permission_table', function (Blueprint $table) {
-            $table->id();
-
-            // add fields
-
-            $table->timestamps();
+        Schema::table('permissions', function (Blueprint $table) {
+            $table->string('group')->nullable();
         });
     }
 };
