@@ -193,7 +193,7 @@ class EnumPermissionCommand extends Command
             $policy
         );
 
-        $policyPath = app_path('App/Policies/'.$policyName.'.php');
+        $policyPath = app_path('Policies/'.$policyName.'.php');
         File::ensureDirectoryExists(dirname($policyPath));
 
         if (File::exists($policyPath)) {
