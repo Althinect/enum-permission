@@ -20,7 +20,9 @@ class EnumPermissionServiceProvider extends PackageServiceProvider
             ->name('enum-permission')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_enum-permission_table')
+            ->hasMigrations([
+                'add_enum_permission_column_to_permissions_table',
+            ])
             ->hasCommand(EnumPermissionCommand::class)
             ->hasCommand(SyncPermissionCommand::class);
     }
