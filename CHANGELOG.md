@@ -2,6 +2,14 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.10 - 2025-01-01
+
+### What's Changed
+
+* fix: SyncPermissionCommand to delete permissions instead of truncating and reset sequence; fix namespace declaration in permission.stub by @tharindarodrigo in https://github.com/Althinect/enum-permission/pull/11
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.9...v0.1.10
+
 ## v0.1.8 - 2024-12-31
 
 ### What's Changed
