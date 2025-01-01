@@ -3,7 +3,6 @@
 namespace Althinect\EnumPermission\Commands;
 
 use Althinect\EnumPermission\Concerns\Helpers;
-use Config;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
@@ -161,7 +160,7 @@ class EnumPermissionCommand extends Command
         } else {
             $policyStub = File::get('vendor/althinect/enum-permission/src/stubs/policy.stub');
         }
-        
+
         $modelName = class_basename($model);
         $namespace = (new ReflectionClass(objectOrClass: $model))->getNamespaceName();
         $modelVariable = lcfirst($modelName);
