@@ -21,7 +21,7 @@ return [
     // The path where the Enum classes will be generated
     // ---------------------------------------------------------------------------
 
-    'user_model' => 'App\Models\User',
+    'user_model' => \App\Models\User::class,
 
     // ---------------------------------------------------------------------------
     // The classes that the models should extend. This helps in model discovery

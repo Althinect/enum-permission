@@ -3,7 +3,9 @@
 namespace Althinect\EnumPermission\Commands;
 
 use Althinect\EnumPermission\Concerns\Helpers;
+use Config;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
 
@@ -150,9 +152,16 @@ class EnumPermissionCommand extends Command
         return $overwrite === 'yes';
     }
 
-    protected function generatePolicy($model, $permissionNamespace): void
+    protected function generatePolicy(Model $model, string $permissionNamespace): void
     {
-        $policyStub = File::get('vendor/althinect/enum-permission/src/stubs/policy.stub');
+        $userModel = config('enum-permission.user_model');
+
+        if ($model instanceof $userModel) {
+            $policyStub = File::get('vendor/althinect/enum-permission/src/stubs/userPolicy.stub');
+        } else {
+            $policyStub = File::get('vendor/althinect/enum-permission/src/stubs/policy.stub');
+        }
+        
         $modelName = class_basename($model);
         $namespace = (new ReflectionClass(objectOrClass: $model))->getNamespaceName();
         $modelVariable = lcfirst($modelName);
