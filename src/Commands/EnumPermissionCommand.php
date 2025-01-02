@@ -72,7 +72,6 @@ class EnumPermissionCommand extends Command
             ) === 'yes';
 
             $this->call('make:model', $modelOptions);
-            sleep(1);
             $this->info('Model created successfully');
 
             return $this->generatePermissionEnums([implode('\\', explode('/', $model))]) === self::SUCCESS;
@@ -218,9 +217,9 @@ class EnumPermissionCommand extends Command
         ];
     }
 
-    private function getAllModels(): array
+    protected function getAllModels(): array
     {
-        $models = array_filter($this->getClassesInDirectory(app_path(config('enum-permission.models_app_path'))), function ($model) {
+        $models = array_filter($this->getClassesInDirectory(base_path(config(key: 'enum-permission.models_path'))), function ($model) {
             return collect(config('enum-permission.model_super_classes'))->contains(fn ($superClass): mixed => $model->isSubclassOf($superClass));
         });
 
@@ -229,7 +228,7 @@ class EnumPermissionCommand extends Command
         }, $models);
     }
 
-    private function getClassesInDirectory($path): array
+    protected function getClassesInDirectory(string $path): array
     {
         $files = File::allFiles($path);
         $models = [];
@@ -246,7 +245,7 @@ class EnumPermissionCommand extends Command
         return $models;
     }
 
-    private function extractNamespace($file): string
+    protected function extractNamespace($file): string
     {
         $ns = '';
         $handle = fopen($file, 'r');
@@ -263,7 +262,7 @@ class EnumPermissionCommand extends Command
         return $ns;
     }
 
-    private function getPermissionsStringCasesForEnum($model): string
+    protected function getPermissionsStringCasesForEnum($model): string
     {
         $permissions = config('enum-permission.permissions');
         $cases = '';
@@ -281,7 +280,7 @@ class EnumPermissionCommand extends Command
         return $cases;
     }
 
-    private function getPolicyMethodStructure(): string
+    protected function getPolicyMethodStructure(): string
     {
         return
     '    public function {{method}}({{arguments}}): bool'.PHP_EOL.
