@@ -2,6 +2,14 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.13 - 2025-01-02
+
+### What's Changed
+
+* feat: Add 'group' column to permissions table with indexing by @tharindarodrigo in https://github.com/Althinect/enum-permission/pull/14
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.12...v0.1.13
+
 ## v0.1.12 - 2025-01-02
 
 ### What's Changed
