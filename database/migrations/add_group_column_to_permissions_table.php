@@ -20,5 +20,5 @@ return new class extends Migration
             $table->dropIndex('permissions_group_index');
             $table->dropColumn('group');
         });
-    }    
+    }
 };
