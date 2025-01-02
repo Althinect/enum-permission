@@ -2,6 +2,14 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.11 - 2025-01-02
+
+### What's Changed
+
+* chore: Update .gitignore and refactor EnumPermissionCommand methods to protected; adjust model path in config by @tharindarodrigo in https://github.com/Althinect/enum-permission/pull/12
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.10...v0.1.11
+
 ## v0.1.10 - 2025-01-01
 
 ### What's Changed
