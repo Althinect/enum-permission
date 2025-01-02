@@ -2,6 +2,14 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.12 - 2025-01-02
+
+### What's Changed
+
+* fix: Correct namespace usage in permission.stub by @tharindarodrigo in https://github.com/Althinect/enum-permission/pull/13
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.11...v0.1.12
+
 ## v0.1.11 - 2025-01-02
 
 ### What's Changed
