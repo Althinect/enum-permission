@@ -2,10 +2,10 @@
 
 return [
     // ---------------------------------------------------------------------------
-    // The path where the Models can be discovered within the "app" directory
+    // The path to the Models
     // ---------------------------------------------------------------------------
 
-    'models_app_path' => 'Models',
+    'models_path' => 'app/Models',
 
     // ---------------------------------------------------------------------------
     // Enums will be generated in a similar path to the models
