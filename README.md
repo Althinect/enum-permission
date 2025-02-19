@@ -1,7 +1,6 @@
 # Laravel Enum Permissions
 
-A Laravel package to easily generate permission classes with enums using Models
-*** This package uses Spatie/Permissions under the hood ***
+A Laravel package to easily manage Permissions with Enums and sync these permissions to your database. This package leverages Spatie/Permissions under the hood and is fully configured via the config file located at `config/enum-permission.php`.
 
 ## Requirements
 
@@ -16,13 +15,12 @@ composer require althinect/enum-permission
 
 ## Configuration
 
-Publish the configuration file:
-
+Publish the configuration file (which is based on the contents of the file `enum-permission.php`):
 ```bash
 php artisan vendor:publish --tag="enum-permission-config"
 ```
 
-The configuration file will be published to `config/enum-permission.php`.
+The configuration file will be published to `config/enum-permission.php`. Customize your permissions, models path, and other options there.
 
 ### Configuration Options
 
@@ -46,6 +44,8 @@ return [
 
 ### Generating Permission Enums
 
+The `permission:make` command (via `EnumPermissionCommand`) generates permission enums (and policies if requested) for your models.
+
 ```bash
 # Generate for a specific model
 php artisan permission:make User
@@ -58,6 +58,8 @@ php artisan permission:make
 ```
 
 ### Syncing Permissions to Database
+
+The `permission:sync` command (via `SyncPermissionCommand`) scans model files for permission enums and syncs them to the database.
 
 ```bash
 # Sync all permissions
