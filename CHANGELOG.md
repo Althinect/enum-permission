@@ -2,6 +2,14 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.16 - 2025-04-06
+
+### What's Changed
+
+* Refactor path handling in EnumPermissionService for stub files by @tharindarodrigo in https://github.com/Althinect/enum-permission/pull/20
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.15...v0.1.16
+
 ## v0.1.15 - 2025-04-06
 
 ### What's Changed
