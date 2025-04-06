@@ -34,7 +34,7 @@ class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix' => '',
         ]);
-        
+
         // Set up enum-permission config
         config()->set('enum-permission.syncPermissionGroup', true);
         config()->set('enum-permission.models_path', 'app/Models');
@@ -42,7 +42,7 @@ class TestCase extends Orchestra
         config()->set('enum-permission.model_super_classes', [
             'Illuminate\\Database\\Eloquent\\Model',
         ]);
-        
+
         // Create a basic user model for testing
         $usersTable = include __DIR__.'/../vendor/orchestra/testbench-core/laravel/migrations/2014_10_12_000000_testbench_create_users_table.php';
         $usersTable->up();

@@ -12,7 +12,6 @@
 */
 
 use Althinect\EnumPermission\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 
 uses(TestCase::class)
@@ -47,11 +46,12 @@ expect()->extend('toBeOne', function () {
 /**
  * Set up the database tables needed for permission testing
  */
-function setUpDatabase() {
+function setUpDatabase()
+{
     // Create required tables directly
     $schema = Schema::connection('testing');
-    
-    if (!$schema->hasTable('permissions')) {
+
+    if (! $schema->hasTable('permissions')) {
         $schema->create('permissions', function ($table) {
             $table->bigIncrements('id');
             $table->string('name');
@@ -60,8 +60,8 @@ function setUpDatabase() {
             $table->timestamps();
         });
     }
-    
-    if (!$schema->hasTable('roles')) {
+
+    if (! $schema->hasTable('roles')) {
         $schema->create('roles', function ($table) {
             $table->bigIncrements('id');
             $table->string('name');
@@ -69,8 +69,8 @@ function setUpDatabase() {
             $table->timestamps();
         });
     }
-    
-    if (!$schema->hasTable('model_has_permissions')) {
+
+    if (! $schema->hasTable('model_has_permissions')) {
         $schema->create('model_has_permissions', function ($table) {
             $table->unsignedBigInteger('permission_id');
             $table->string('model_type');
@@ -79,8 +79,8 @@ function setUpDatabase() {
             $table->primary(['permission_id', 'model_id', 'model_type'], 'model_has_perms_prim');
         });
     }
-    
-    if (!$schema->hasTable('model_has_roles')) {
+
+    if (! $schema->hasTable('model_has_roles')) {
         $schema->create('model_has_roles', function ($table) {
             $table->unsignedBigInteger('role_id');
             $table->string('model_type');
@@ -89,8 +89,8 @@ function setUpDatabase() {
             $table->primary(['role_id', 'model_id', 'model_type'], 'model_has_roles_prim');
         });
     }
-    
-    if (!$schema->hasTable('role_has_permissions')) {
+
+    if (! $schema->hasTable('role_has_permissions')) {
         $schema->create('role_has_permissions', function ($table) {
             $table->unsignedBigInteger('permission_id');
             $table->unsignedBigInteger('role_id');
