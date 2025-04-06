@@ -2,6 +2,14 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v0.1.15 - 2025-04-06
+
+### What's Changed
+
+* feat: Refactor permission handling and enhance command functionality by @tharindarodrigo in https://github.com/Althinect/enum-permission/pull/19
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.14...v0.1.15
+
 ## v0.1.14 - 2025-02-19
 
 ### What's Changed
