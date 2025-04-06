@@ -4,8 +4,9 @@ A Laravel package to easily manage Permissions with Enums and sync these permiss
 
 ## Requirements
 
-- PHP 8.1 or higher
+- PHP 8.1 or higher (required for Enums support)
 - Laravel 10.0 or higher
+- Spatie/Laravel-Permission package
 
 ## Installation
 
@@ -15,7 +16,7 @@ composer require althinect/enum-permission
 
 ## Configuration
 
-Publish the configuration file (which is based on the contents of the file `enum-permission.php`):
+Publish the configuration file:
 ```bash
 php artisan vendor:publish --tag="enum-permission-config"
 ```
@@ -26,17 +27,37 @@ The configuration file will be published to `config/enum-permission.php`. Custom
 
 ```php
 return [
-    'models_path' => 'Models', // Path to your models
-    'user_model' => \App\Models\User::class, // Your User model
+    // Path to your models
+    'models_path' => 'app/Models',
+    
+    // Your User model
+    'user_model' => \App\Models\User::class,
+    
+    // Classes that models should extend for discovery
+    'model_super_classes' => [
+        'Illuminate\Database\Eloquent\Model',
+        'Illuminate\Foundation\Auth\User',
+    ],
+    
+    // Permission definitions for policy methods
     'permissions' => [
         [
             'method' => 'viewAny',
-            'arguments' => ['User $user'],
+            'arguments' => ['{{userModelName}} $user'],
             'enum_case' => 'VIEW_ANY',
-            'enum_value' => '{{modelName}}.viewAny'
+            'enum_value' => '{{modelName}}.view-any'
         ],
         // ... other permissions
-    ]
+    ],
+    
+    // Auth guards to create permissions for
+    'guards' => [
+        'web',
+        'api',
+    ],
+    
+    // Whether to sync permission groups
+    'syncPermissionGroup' => true,
 ];
 ```
 
@@ -44,7 +65,7 @@ return [
 
 ### Generating Permission Enums
 
-The `permission:make` command (via `EnumPermissionCommand`) generates permission enums (and policies if requested) for your models.
+The `permission:make` command generates permission enums (and policies if requested) for your models.
 
 ```bash
 # Generate for a specific model
@@ -53,13 +74,16 @@ php artisan permission:make User
 # Generate with policy
 php artisan permission:make User --policy
 
+# Skip confirmation prompts (useful for CI/CD)
+php artisan permission:make User --force
+
 # Interactive selection of models
 php artisan permission:make
 ```
 
 ### Syncing Permissions to Database
 
-The `permission:sync` command (via `SyncPermissionCommand`) scans model files for permission enums and syncs them to the database.
+The `permission:sync` command scans for permission enums and syncs them to the database.
 
 ```bash
 # Sync all permissions
@@ -67,11 +91,22 @@ php artisan permission:sync
 
 # Clean existing permissions before sync
 php artisan permission:sync --clean
+
+# Skip confirmation prompts (useful for CI/CD)
+php artisan permission:sync --force
+
+# Specify a custom path to scan for permissions
+php artisan permission:sync --path=app/Domain/Auth/Permissions
 ```
 
 ### Using Generated Permissions
 
 ```php
+// In your controllers or services
+if ($user->hasPermissionTo(PostPermission::CREATE)) {
+    // User can create posts
+}
+
 // In your policies
 public function view(User $user, Post $post): bool
 {
@@ -87,16 +122,30 @@ After generation, your files will be organized as follows:
 app/
 ├── Models/
 │   └── User.php
-├── Permissions/
+├── Permissions/  (mirrors your Models directory structure)
 │   └── UserPermission.php
 └── Policies/
     └── UserPolicy.php
 ```
 
+If your models use domain-driven structure, permission enums will follow the same structure:
+
+```
+app/
+├── Domain/
+│   └── Blog/
+│       ├── Models/
+│       │   └── Post.php
+│       └── Permissions/
+│           └── PostPermission.php
+└── Policies/
+    └── PostPolicy.php
+```
+
 ## Available Commands
 
-- `permission:make {model?} {--P|policy}` - Generate permission enums
-- `permission:sync {--C|clean}` - Sync permissions to database
+- `permission:make {modelName?} {--P|policy} {--force}` - Generate permission enums and optional policies
+- `permission:sync {--C|clean} {--path=} {--force}` - Sync permissions to database
 
 ## Examples
 
@@ -105,31 +154,75 @@ app/
 ```php
 namespace App\Permissions;
 
+use Althinect\EnumPermission\Concerns\HasPermissionGroup;
+
 enum UserPermission: string
 {
-    case VIEW_ANY = 'User.viewAny';
+    use HasPermissionGroup;
+
+    case VIEW_ANY = 'User.view-any';
     case VIEW = 'User.view';
     case CREATE = 'User.create';
     case UPDATE = 'User.update';
     case DELETE = 'User.delete';
     case RESTORE = 'User.restore';
-    case FORCE_DELETE = 'User.forceDelete';
+    case FORCE_DELETE = 'User.force-delete';
 }
 ```
 
-### Using with Policies
+### Generated Policy
 
 ```php
+namespace App\Policies;
+
+use App\Models\User;
 use App\Permissions\UserPermission;
 
 class UserPolicy
 {
+    public function viewAny(User $user): bool
+    {
+        return $user->hasPermissionTo(UserPermission::VIEW_ANY);
+    }
+    
     public function view(User $user, User $model): bool
     {
         return $user->hasPermissionTo(UserPermission::VIEW);
     }
+    
+    // Additional methods for create, update, delete, etc.
 }
 ```
+
+### Permission Groups
+
+When `syncPermissionGroup` is enabled, permissions will be grouped by model name, which is helpful for UI-based permission management:
+
+```php
+// In UserPermission.php
+public static function getPermissionGroup(): string
+{
+    return str_replace('Permission', '', class_basename(static::class)); // Returns "User"
+}
+```
+
+## Error Handling
+
+The package includes comprehensive error handling:
+
+- Database compatibility across PostgreSQL, MySQL, and other supported systems
+- Graceful failure when encountering invalid classes
+- File operation safeguards
+- Exception reporting for debugging
+
+## Extending the Package
+
+You can extend the package's functionality by:
+
+1. Customizing the permission stubs in the config file
+2. Adding custom permission groups
+3. Creating middleware that uses the permission enums
+4. Building custom UI components for managing permissions
 
 ## Contributing
 

@@ -3,6 +3,7 @@
 namespace Althinect\EnumPermission\Commands;
 
 use Althinect\EnumPermission\Concerns\Helpers;
+use Althinect\EnumPermission\Services\EnumPermissionService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use ReflectionClass;
@@ -15,9 +16,20 @@ class EnumPermissionCommand extends Command
 {
     use Helpers;
 
-    public $signature = 'permission:make {modelName?} {--P|policy}';
+    public $signature = 'permission:make {modelName?} {--P|policy} {--force}';
 
     public $description = 'Generate Permissions Enum';
+
+    /**
+     * @var \Althinect\EnumPermission\Services\EnumPermissionService
+     */
+    protected $service;
+
+    public function __construct(EnumPermissionService $service)
+    {
+        parent::__construct();
+        $this->service = $service;
+    }
 
     public function handle(): int
     {
@@ -103,107 +115,62 @@ class EnumPermissionCommand extends Command
     protected function generatePermissionEnums(array $models): int
     {
         foreach ($models as $model) {
-            $permissionCases = $this->getPermissionsStringCasesForEnum($model);
+            try {
+                $enumData = $this->service->generateEnumContent($model);
 
-            $modelName = class_basename($model);
-            $namespace = str_replace('Models', 'Permissions', (new ReflectionClass($model))->getNamespaceName());
-            $modelPath = str_replace('Models', 'Permissions', (new ReflectionClass($model))->getFileName());
-            $permissionEnumPath = str_replace('.php', 'Permission.php', $modelPath);
+                File::ensureDirectoryExists(dirname($enumData['path']));
 
-            $permissionStub = File::get('vendor/althinect/enum-permission/src/stubs/permission.stub');
-            $permissionEnum = str_replace(['{{cases}}', '{{enumName}}', '{{namespace}}'], [$permissionCases, $modelName.'Permission', $namespace], $permissionStub);
+                if (File::exists($enumData['path'])) {
+                    if ($this->option('force') || $this->shouldOverwriteFile($enumData['path'])) {
+                        File::put($enumData['path'], $enumData['content']);
+                    } else {
+                        $this->info('Permission enum generation skipped for '.class_basename($model));
 
-            File::ensureDirectoryExists(dirname($permissionEnumPath));
-
-            if (File::exists($permissionEnumPath)) {
-                if ($this->shouldOverwriteFile($permissionEnumPath)) {
-                    File::put($permissionEnumPath, $permissionEnum);
+                        continue;
+                    }
                 } else {
-                    $this->info('Permission enum generation skipped for '.$modelName);
-
-                    continue;
+                    File::put($enumData['path'], $enumData['content']);
                 }
-            } else {
-                File::put($permissionEnumPath, $permissionEnum);
-            }
 
-            $this->info('Permission enum generated successfully for '.$modelName);
+                $this->info('Permission enum generated successfully for '.class_basename($model));
 
-            if ($this->option('policy')) {
-                $this->info('Generating policy for '.$modelName);
-                $this->generatePolicy($model, $namespace);
+                if ($this->option('policy')) {
+                    $this->info('Generating policy for '.class_basename($model));
+                    $this->generatePolicy($model, $enumData['namespace']);
+                }
+            } catch (\Exception $e) {
+                $this->error('Failed to generate permission enum for '.$model.': '.$e->getMessage());
+
+                continue;
             }
         }
 
         return self::SUCCESS;
     }
 
-    protected function shouldOverwriteFile(string $filePath): bool
-    {
-        $overwrite = select(
-            required: true,
-            label: 'File '.$filePath.' already exists. Do you want to overwrite it?',
-            options: ['yes', 'no'],
-        );
-
-        return $overwrite === 'yes';
-    }
-
     protected function generatePolicy($model, $permissionNamespace): void
     {
-        $policyStub = File::get('vendor/althinect/enum-permission/src/stubs/policy.stub');
-        $modelName = class_basename($model);
-        $namespace = (new ReflectionClass(objectOrClass: $model))->getNamespaceName();
-        $modelVariable = lcfirst($modelName);
-        $policyName = $modelName.'Policy';
-        $userModel = config('enum-permission.user_model');
-        $permissionEnumName = $modelName.'Permission';
-        $permissionEnum = $permissionNamespace.'\\'.$permissionEnumName;
+        try {
+            $policyData = $this->service->generatePolicyContent($model, $permissionNamespace);
 
-        $permissions = config('enum-permission.permissions');
-        $methods = '';
+            File::ensureDirectoryExists(dirname($policyData['path']));
 
-        $policy = str_replace(
-            ['{{namespace}}', '{{modelName}}', '{{permissionEnum}}', '{{policyName}}', '{{model}}', '{{modelVariable}}'],
-            [$namespace, $modelName, $permissionEnum, $policyName, $model, $modelVariable],
-            $policyStub
-        );
+            if (File::exists($policyData['path'])) {
+                if ($this->option('force') || $this->shouldOverwriteFile($policyData['path'])) {
+                    File::put($policyData['path'], $policyData['content']);
+                } else {
+                    $this->info('Policy generation skipped for '.class_basename($model));
 
-        foreach ($permissions as $permission) {
-            $arguments = implode(', ', $permission['arguments']);
-            $enumCase = $permission['enum_case'];
-            $enumValue = $permission['enum_value'];
-
-            $policyMethodStructure = $this->getPolicyMethodStructure();
-
-            $methods .= str_replace(
-                ['{{method}}', '{{arguments}}', '{{enumValue}}', '{{enumCase}}'],
-                [$permission['method'], $arguments, $enumValue, $enumCase],
-                $policyMethodStructure
-            );
-        }
-        $policy = str_replace('{{methods}}', $methods, $policy);
-
-        $userModelName = class_basename($userModel);
-
-        $policy = str_replace(
-            ['{{userModel}}', '{{userModelName}}', '{{modelName}}', '{{permissionEnumName}}'],
-            [$userModel, $userModelName, $modelName, $permissionEnumName],
-            $policy
-        );
-
-        $policyPath = app_path('Policies/'.$policyName.'.php');
-        File::ensureDirectoryExists(dirname($policyPath));
-
-        if (File::exists($policyPath)) {
-            if (! $this->shouldOverwriteFile($policyPath)) {
-                $this->info('Policy generation skipped for '.$modelName);
-
-                return;
+                    return;
+                }
+            } else {
+                File::put($policyData['path'], $policyData['content']);
             }
-        }
 
-        File::put($policyPath, $policy);
+            $this->info('Policy generated successfully for '.class_basename($model));
+        } catch (\Exception $e) {
+            $this->error('Failed to generate policy for '.$model.': '.$e->getMessage());
+        }
     }
 
     protected function promptForMissingArgumentsUsing(): array
@@ -223,7 +190,7 @@ class EnumPermissionCommand extends Command
             return collect(config('enum-permission.model_super_classes'))->contains(fn ($superClass): mixed => $model->isSubclassOf($superClass));
         });
 
-        return $models = array_map(function ($model) {
+        return array_map(function ($model) {
             return $model->getName();
         }, $models);
     }
