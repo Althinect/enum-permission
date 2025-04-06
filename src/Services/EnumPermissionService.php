@@ -25,7 +25,7 @@ class EnumPermissionService
         $modelPath = str_replace('Models', 'Permissions', (new ReflectionClass($modelClass))->getFileName());
         $permissionEnumPath = str_replace('.php', 'Permission.php', $modelPath);
 
-        $permissionStub = File::get(base_path('src/stubs/permission.stub'));
+        $permissionStub = File::get(__DIR__.'/../stubs/permission.stub');
         $permissionEnum = str_replace(
             ['{{cases}}', '{{enumName}}', '{{namespace}}'],
             [$permissionCases, $modelName.'Permission', $namespace],
@@ -49,7 +49,7 @@ class EnumPermissionService
      */
     public function generatePolicyContent(string $modelClass, string $permissionNamespace): array
     {
-        $policyStub = File::get(base_path('src/stubs/policy.stub'));
+        $policyStub = File::get(__DIR__.'/../stubs/policy.stub');
         $modelName = class_basename($modelClass);
         $namespace = (new ReflectionClass(objectOrClass: $modelClass))->getNamespaceName();
         $modelVariable = lcfirst($modelName);
