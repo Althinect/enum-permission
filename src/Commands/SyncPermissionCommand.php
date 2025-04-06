@@ -3,105 +3,101 @@
 namespace Althinect\EnumPermission\Commands;
 
 use Althinect\EnumPermission\Concerns\Helpers;
+use Althinect\EnumPermission\Services\EnumPermissionService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use ReflectionClass;
-use ReflectionException;
-use Spatie\Permission\Models\Permission;
 
-use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 
 class SyncPermissionCommand extends Command
 {
     use Helpers;
 
-    public $signature = 'permission:sync {--C|clean}';
+    public $signature = 'permission:sync {--C|clean} {--path=} {--force}';
 
     public $description = 'Sync Permissions to the DB';
+
+    /**
+     * @var \Althinect\EnumPermission\Services\EnumPermissionService
+     */
+    protected $service;
+
+    public function __construct(EnumPermissionService $service)
+    {
+        parent::__construct();
+        $this->service = $service;
+    }
 
     public function handle(): int
     {
         $this->info('Syncing Permissions...');
 
-        $permissionFiles = $this->getPermissionFiles();
+        $customPath = $this->option('path');
+        $permissionFiles = $this->getPermissionFiles($customPath);
 
-        if ($this->option('clean')) {
+        if (empty($permissionFiles)) {
+            $this->warn('No permission enum files found'.($customPath ? ' in path: '.$customPath : ''));
 
-            // confirm if the user wants to clean the permissions
-            select(
-                required: true,
-                label: 'Do you want to clean the permissions? This will delete all the permissions in the database',
-                options: ['yes', 'no'],
-                default: 'no'
-            );
-
-            DB::table('permissions')->delete();
-            DB::statement('ALTER SEQUENCE permissions_id_seq RESTART WITH 1;');
+            return self::FAILURE;
         }
 
-        foreach ($permissionFiles as $permissionFile) {
+        if ($this->option('clean')) {
+            if (! $this->option('force')) {
+                // confirm if the user wants to clean the permissions
+                $confirm = select(
+                    required: true,
+                    label: 'Do you want to clean the permissions? This will delete all the permissions in the database',
+                    options: ['yes', 'no'],
+                    default: 'no'
+                );
 
-            $permissionClass = $this->extractNamespace($permissionFile->getPathname()).'\\'.$permissionFile->getBasename('.php');
+                if ($confirm !== 'yes') {
+                    $this->info('Clean operation cancelled');
+
+                    return self::SUCCESS;
+                }
+            }
+
+            try {
+                DB::table('permissions')->delete();
+
+                // Use a database-agnostic approach to reset IDs
+                $driver = DB::connection()->getDriverName();
+                if ($driver === 'pgsql') {
+                    DB::statement('ALTER SEQUENCE permissions_id_seq RESTART WITH 1;');
+                } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                    DB::statement('ALTER TABLE permissions AUTO_INCREMENT = 1;');
+                }
+
+                $this->info('All permissions have been removed from the database');
+            } catch (\Exception $e) {
+                $this->error('Failed to clean permissions: '.$e->getMessage());
+
+                return self::FAILURE;
+            }
+        }
+
+        $syncedCount = 0;
+        $failedCount = 0;
+
+        foreach ($permissionFiles as $permissionFile) {
+            $permissionClass = $this->extractNamespace(file: $permissionFile->getPathname()).'\\'.$permissionFile->getBasename(suffix: '.php');
 
             $this->info("Processing {$permissionClass}");
 
-            if (! $this->isEnumClass($permissionClass)) {
-                $this->warn('Class is not an Enum class');
+            $result = $this->service->syncPermissionEnumToDatabase($permissionClass);
 
-                continue;
-            }
-
-            $cases = $permissionClass::cases();
-
-            $guards = array_keys(config('auth.guards'));
-
-            foreach ($guards as $guard) {
-                foreach ($cases as $case) {
-                    $permission = [
-                        'name' => $case->value,
-                        'guard_name' => $guard,
-                    ];
-
-                    if (config('enum-permission.syncPermissionGroup')) {
-                        $permission['group'] = $permissionClass::getPermissionGroup();
-                    }
-
-                    Permission::firstOrCreate($permission);
-                }
+            if ($result['success']) {
+                $this->info($result['message']);
+                $syncedCount += $result['count'];
+            } else {
+                $this->warn($result['message']);
+                $failedCount++;
             }
         }
+
+        $this->info("Permissions sync complete. Synced: {$syncedCount}, Failed: {$failedCount}");
 
         return self::SUCCESS;
-    }
-
-    private function isEnumClass(string $classPath): bool
-    {
-        try {
-            $reflection = new ReflectionClass($classPath);
-
-            return $reflection->isEnum();
-        } catch (ReflectionException $e) {
-            return false;
-        }
-    }
-
-    public function getPermissionFiles()
-    {
-        $permissionClasses = [];
-        $files = File::allFiles(app_path());
-
-        // Search all the Enum files that are Suffixed with Permission
-        foreach ($files as $file) {
-            $fileName = $file->getFilename();
-            $fileExtension = $file->getExtension();
-
-            if ($fileExtension === 'php' && strpos($fileName, 'Permission') !== false) {
-                $permissionClasses[] = $file;
-            }
-        }
-
-        return $permissionClasses;
     }
 }
