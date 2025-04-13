@@ -108,5 +108,5 @@ return [
     // The group is determined by the getPermissionGroup method in the Enum class
     // ---------------------------------------------------------------------------
 
-    'syncPermissionGroup' => true,
+    'sync_permission_group' => false,
 ];

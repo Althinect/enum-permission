@@ -36,7 +36,7 @@ class TestCase extends Orchestra
         ]);
 
         // Set up enum-permission config
-        config()->set('enum-permission.syncPermissionGroup', true);
+        config()->set('enum-permission.sync_permission_group', true);
         config()->set('enum-permission.models_path', 'app/Models');
         config()->set('enum-permission.user_model', 'App\\Models\\User');
         config()->set('enum-permission.model_super_classes', [

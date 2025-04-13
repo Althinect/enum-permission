@@ -1,6 +1,6 @@
 # Laravel Enum Permissions
 
-A Laravel package to easily manage Permissions with Enums and sync these permissions to your database. This package leverages Spatie/Permissions under the hood and is fully configured via the config file located at `config/enum-permission.php`.
+A Laravel package to easily manage Permissions with Enums and sync these permissions to your database. This package is built on top of Spatie's Laravel-Permission package, providing an enum-based approach to permission management. It's fully configured via the config file located at `config/enum-permission.php`.
 
 ## Requirements
 
@@ -14,12 +14,24 @@ A Laravel package to easily manage Permissions with Enums and sync these permiss
 composer require althinect/enum-permission
 ```
 
-## Configuration
+This package automatically installs Spatie's Laravel-Permission package as a dependency, so you don't need to require it separately.
 
-Publish the configuration file:
+### Spatie configs
+You will need to run the migrations and add the necessary configs according to the Spatie Permissions documentation
+
+After installation, publish the configuration file:
+
 ```bash
 php artisan vendor:publish --tag="enum-permission-config"
 ```
+
+Then run the migrations to set up all required tables including the permissions tables from Spatie and the group column added by this package:
+
+```bash
+php artisan migrate
+```
+
+## Configuration
 
 The configuration file will be published to `config/enum-permission.php`. Customize your permissions, models path, and other options there.
 
@@ -57,9 +69,28 @@ return [
     ],
     
     // Whether to sync permission groups
-    'syncPermissionGroup' => true,
+    'sync_permission_group' => true,
 ];
 ```
+
+## Migrations
+
+This package relies on the database tables created by the Spatie Laravel-Permission package and automatically adds a 'group' column to the permissions table for better organization.
+
+When you install this package and run migrations, two things happen:
+
+1. The Spatie migrations create the core permission tables:
+   - `permissions` - Stores all permissions
+   - `roles` - Stores all roles
+   - `model_has_permissions` - Maps permissions to users or other models
+   - `model_has_roles` - Maps roles to users or other models
+   - `role_has_permissions` - Maps permissions to roles
+
+2. This package adds its own migration to enhance the permissions table:
+   - Adds a `group` column to the `permissions` table
+   - Creates an index on the `group` column for faster queries
+
+The `group` column is used when `sync_permission_group` is enabled in the config, allowing permissions to be organized by model name, which is especially useful for UI-based permission management systems.
 
 ## Usage
 
@@ -196,7 +227,7 @@ class UserPolicy
 
 ### Permission Groups
 
-When `syncPermissionGroup` is enabled, permissions will be grouped by model name, which is helpful for UI-based permission management:
+When `sync_permission_group` is enabled in the config (enabled by default), permissions will be grouped by model name, which is helpful for UI-based permission management:
 
 ```php
 // In UserPermission.php
@@ -205,6 +236,22 @@ public static function getPermissionGroup(): string
     return str_replace('Permission', '', class_basename(static::class)); // Returns "User"
 }
 ```
+
+This feature uses the `group` column added to the `permissions` table by this package's migration. The permissions are grouped automatically during the sync process:
+
+```php
+// Example of how permissions are stored with groups
+[
+    'name' => 'User.view',
+    'guard_name' => 'web',
+    'group' => 'User' // <-- This groups all User permissions together
+]
+```
+
+This grouping makes it easy to:
+- Create model-based permission management UIs
+- Filter permissions by model in your admin panels
+- Apply batch operations to all permissions of a specific model
 
 ## Error Handling
 

@@ -165,7 +165,7 @@ class EnumPermissionService
                         'guard_name' => $guard,
                     ];
 
-                    if (config('enum-permission.syncPermissionGroup')) {
+                    if (config('enum-permission.sync_permission_group')) {
                         $permission['group'] = $permissionClass::getPermissionGroup();
                     }
 
