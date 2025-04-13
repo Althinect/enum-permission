@@ -1,8 +1,8 @@
 # Laravel Enum Permissions
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/althinect/enum-permissions.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
-[![Total Downloads](https://img.shields.io/packagist/dt/althinect/enum-permissions.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
-![GitHub Actions](https://github.com/althinect/enum-permissions/actions/workflows/main.yml/badge.svg)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/althinect/enum-permission.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
+[![Total Downloads](https://img.shields.io/packagist/dt/althinect/enum-permission.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
+![GitHub Actions](https://github.com/althinect/enum-permission/actions/workflows/main.yml/badge.svg)
 
 A Laravel package to easily manage Permissions with Enums and sync these permissions to your database. This package is built on top of Spatie's Laravel-Permission package, providing an enum-based approach to permission management. It's fully configured via the config file located at `config/enum-permission.php`.
 
@@ -73,7 +73,7 @@ return [
     ],
     
     // Whether to sync permission groups
-    'sync_permission_group' => true,
+    'sync_permission_group' => false,
 ];
 ```
 
@@ -231,7 +231,7 @@ class UserPolicy
 
 ### Permission Groups
 
-When `sync_permission_group` is enabled in the config (enabled by default), permissions will be grouped by model name, which is helpful for UI-based permission management:
+When `sync_permission_group` is enabled in the config, permissions will be grouped by model name, which is helpful for UI-based permission management:
 
 ```php
 // In UserPermission.php
