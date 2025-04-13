@@ -2,6 +2,10 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v1.0.0 - 2025-04-13
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.16...v1.0.0
+
 ## v0.1.16 - 2025-04-06
 
 ### What's Changed
