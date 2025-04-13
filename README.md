@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/althinect/enum-permission.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
 [![Total Downloads](https://img.shields.io/packagist/dt/althinect/enum-permission.svg?style=flat-square)](https://packagist.org/packages/althinect/enum-permission)
-![GitHub Actions](https://github.com/althinect/enum-permission/actions/workflows/main.yml/badge.svg)
+![GitHub Actions](https://github.com/Althinect/enum-permission/actions)
 
 A Laravel package to easily manage Permissions with Enums and sync these permissions to your database. This package is built on top of Spatie's Laravel-Permission package, providing an enum-based approach to permission management. It's fully configured via the config file located at `config/enum-permission.php`.
 
