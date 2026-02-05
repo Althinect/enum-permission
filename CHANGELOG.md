@@ -2,6 +2,18 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v1.0.1 - 2026-02-05
+
+### What's Changed
+
+* chore(deps): bump dependabot/fetch-metadata from 2.3.0 to 2.4.0 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/21
+* chore(deps): bump aglipanci/laravel-pint-action from 2.5 to 2.6 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/23
+* chore(deps): bump dependabot/fetch-metadata from 2.4.0 to 2.5.0 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/27
+* chore(deps): bump stefanzweifel/git-auto-commit-action from 5 to 7 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/25
+* chore(deps): bump actions/checkout from 4 to 6 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/26
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v1.0.0...v1.0.1
+
 ## v1.0.0 - 2025-04-13
 
 **Full Changelog**: https://github.com/Althinect/enum-permission/compare/v0.1.16...v1.0.0
