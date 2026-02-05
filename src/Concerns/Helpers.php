@@ -87,9 +87,15 @@ trait Helpers
     {
         if (! function_exists('Laravel\Prompts\select')) {
             // Fallback for environments without Laravel Prompts
-            $this->info('File '.$filePath.' already exists.');
+            if (method_exists($this, 'info')) {
+                $this->info('File '.$filePath.' already exists.');
+            }
 
-            return $this->confirm('Do you want to overwrite it?', false);
+            if (method_exists($this, 'confirm')) {
+                return (bool) $this->confirm('Do you want to overwrite it?', false);
+            }
+
+            return false;
         }
 
         return \Laravel\Prompts\select(

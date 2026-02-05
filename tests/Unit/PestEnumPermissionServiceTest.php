@@ -2,8 +2,6 @@
 
 use Althinect\EnumPermission\Services\EnumPermissionService;
 use Illuminate\Support\Facades\File;
-use Mockery;
-use Spatie\Permission\Models\Permission;
 
 // Setup and teardown
 beforeEach(function () {
@@ -30,9 +28,8 @@ beforeEach(function () {
     }
 
     // Create a real enum class for testing
-    File::put(
-        app_path('Permissions/TestModelPermission.php'),
-        <<<'EOT'
+    $path = app_path('Permissions/TestModelPermission.php');
+    File::put($path, <<<'EOT'
 <?php
 namespace App\Permissions;
 
@@ -47,6 +44,8 @@ enum TestModelPermission: string
 }
 EOT
     );
+
+    require_once $path;
 
     // Set up config values
     config()->set('enum-permission.models_path', 'app/Models');
@@ -100,31 +99,27 @@ afterEach(function () {
 
 // Tests
 it('syncs permissions to database', function () {
-    // Create permissions directly for testing
-    Permission::create([
+    // Sync permissions using the service
+    $result = $this->service->syncPermissionEnumToDatabase('App\\Permissions\\TestModelPermission');
+
+    // Check successful result
+    expect($result['success'])->toBeTrue();
+
+    // Default config has web guard. So 2 permissions * 1 guard = 2 synced
+    expect($result['count'])->toBe(2);
+
+    // Check that permissions are in the database
+    $this->assertDatabaseHas('permissions', [
         'name' => 'TestModel.view',
         'guard_name' => 'web',
         'group' => 'TestModel',
     ]);
 
-    Permission::create([
+    $this->assertDatabaseHas('permissions', [
         'name' => 'TestModel.create',
         'guard_name' => 'web',
         'group' => 'TestModel',
     ]);
-
-    // Check that permissions are in the database
-    $this->assertDatabaseHas('permissions', ['name' => 'TestModel.view']);
-    $this->assertDatabaseHas('permissions', ['name' => 'TestModel.create']);
-
-    // Check the permission group
-    $this->assertDatabaseHas('permissions', [
-        'name' => 'TestModel.view',
-        'group' => 'TestModel',
-    ]);
-
-    // Test passes if we get here
-    expect(true)->toBeTrue();
 });
 
 it('handles invalid enum class', function () {

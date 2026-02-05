@@ -44,7 +44,12 @@ class TestCase extends Orchestra
         ]);
 
         // Create a basic user model for testing
-        $usersTable = include __DIR__.'/../vendor/orchestra/testbench-core/laravel/migrations/2014_10_12_000000_testbench_create_users_table.php';
+        $migrationPath = __DIR__.'/../vendor/orchestra/testbench-core/laravel/migrations';
+        $migrationFile = file_exists($migrationPath.'/2014_10_12_000000_testbench_create_users_table.php')
+            ? $migrationPath.'/2014_10_12_000000_testbench_create_users_table.php'
+            : $migrationPath.'/0001_01_01_000000_testbench_create_users_table.php';
+
+        $usersTable = include $migrationFile;
         $usersTable->up();
     }
 }
