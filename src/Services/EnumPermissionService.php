@@ -158,18 +158,21 @@ class EnumPermissionService
             $guards = array_keys(config('auth.guards'));
             $syncedCount = 0;
 
+            $syncGroup = config('enum-permission.sync_permission_group') || config('enum-permission.syncPermissionGroup');
+
             foreach ($guards as $guard) {
                 foreach ($cases as $case) {
-                    $permission = [
+                    $search = [
                         'name' => $case->value,
                         'guard_name' => $guard,
                     ];
 
-                    if (config('enum-permission.sync_permission_group')) {
-                        $permission['group'] = $permissionClass::getPermissionGroup();
+                    $values = [];
+                    if ($syncGroup) {
+                        $values['group'] = $permissionClass::getPermissionGroup();
                     }
 
-                    Permission::firstOrCreate($permission);
+                    Permission::updateOrCreate($search, $values);
                     $syncedCount++;
                 }
             }
