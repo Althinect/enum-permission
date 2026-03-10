@@ -1,0 +1,31 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to function method_exists\(\) with \$this\(Althinect\\EnumPermission\\Commands\\EnumPermissionCommand\) and ''confirm'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Commands/EnumPermissionCommand.php
+
+		-
+			message: '#^Call to function method_exists\(\) with \$this\(Althinect\\EnumPermission\\Commands\\EnumPermissionCommand\) and ''info'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Commands/EnumPermissionCommand.php
+
+		-
+			message: '#^Call to function method_exists\(\) with \$this\(Althinect\\EnumPermission\\Commands\\SyncPermissionCommand\) and ''confirm'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Commands/SyncPermissionCommand.php
+
+		-
+			message: '#^Call to function method_exists\(\) with \$this\(Althinect\\EnumPermission\\Commands\\SyncPermissionCommand\) and ''info'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Commands/SyncPermissionCommand.php
+
+		-
+			message: '#^Trait Althinect\\EnumPermission\\Concerns\\HasPermissionGroup is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Concerns/HasPermissionGroup.php
