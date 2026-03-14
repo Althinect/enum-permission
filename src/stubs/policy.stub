@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Policies;
+
+use {{userModel}};
+use {{model}};
+use {{permissionEnum}};
+
+class {{policyName}}
+{
+{{methods}}
+}
