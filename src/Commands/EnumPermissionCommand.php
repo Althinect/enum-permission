@@ -21,7 +21,7 @@ class EnumPermissionCommand extends Command
     public $description = 'Generate Permissions Enum';
 
     /**
-     * @var \Althinect\EnumPermission\Services\EnumPermissionService
+     * @var EnumPermissionService
      */
     protected $service;
 

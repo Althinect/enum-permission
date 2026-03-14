@@ -18,7 +18,7 @@ class SyncPermissionCommand extends Command
     public $description = 'Sync Permissions to the DB';
 
     /**
-     * @var \Althinect\EnumPermission\Services\EnumPermissionService
+     * @var EnumPermissionService
      */
     protected $service;
 
