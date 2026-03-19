@@ -7,8 +7,8 @@ A Laravel package to easily manage Permissions with Enums and sync these permiss
 
 ## Requirements
 
-- PHP 8.1 or higher (required for Enums support)
-- Laravel 10.0 or higher
+- PHP 8.2 or higher
+- Laravel 10.0 to 13.x
 - Spatie/Laravel-Permission package
 
 ## Installation

@@ -2,6 +2,15 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v1.0.2 - 2026-03-19
+
+### What's Changed
+
+* Add Laravel 13 compatibility (`illuminate/contracts:^13.0`)
+* Add Orchestra Testbench 11 support for Laravel 13 test runs
+* Expand CI matrix to validate Laravel 10, 11, 12, and 13
+* Update package requirements documentation
+
 ## v1.0.1 - 2026-02-05
 
 ### What's Changed
