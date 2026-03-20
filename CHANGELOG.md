@@ -2,6 +2,10 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## Laravel 13 support - 2026-03-20
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/commits/v1.1
+
 ## v1.0.2 - 2026-03-19
 
 ### What's Changed
