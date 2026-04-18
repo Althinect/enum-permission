@@ -19,20 +19,25 @@ composer require althinect/enum-permission
 
 This package automatically installs Spatie's Laravel-Permission package as a dependency, so you don't need to require it separately.
 
-### Spatie configs
-You will need to run the migrations and add the necessary configs according to the Spatie Permissions documentation
+### Publish configuration and migrations
 
-After installation, publish the configuration file:
+Before running migrations, publish the configuration and migration files used by both Spatie's Laravel Permission package and this package:
 
 ```bash
+php artisan vendor:publish --tag="permission-config"
 php artisan vendor:publish --tag="enum-permission-config"
+
+php artisan vendor:publish --tag="permission-migrations"
+php artisan vendor:publish --tag="enum-permission-migrations"
 ```
 
-Then run the migrations to set up all required tables including the permissions tables from Spatie and the group column added by this package:
+Then run the migrations to set up Spatie's permission tables and this package's grouped-permission support:
 
 ```bash
 php artisan migrate
 ```
+
+If you are upgrading an existing installation, publishing `enum-permission-migrations` and running migrations will add the `group` column to your existing `permissions` table.
 
 ## Configuration
 
@@ -78,7 +83,7 @@ return [
 
 ## Migrations
 
-This package relies on the database tables created by the Spatie Laravel-Permission package and automatically adds a 'group' column to the permissions table for better organization.
+This package builds on the database tables created by Spatie Laravel-Permission and ships an additional publishable migration under the `enum-permission-migrations` tag to add a `group` column to the `permissions` table.
 
 When you install this package and run migrations, two things happen:
 
@@ -93,7 +98,9 @@ When you install this package and run migrations, two things happen:
    - Adds a `group` column to the `permissions` table
    - Creates an index on the `group` column for faster queries
 
-The `group` column is used when `sync_permission_group` is enabled in the config, allowing permissions to be organized by model name, which is especially useful for UI-based permission management systems.
+The `group` column is used when `sync_permission_group` is enabled in the config, allowing permissions to be organized by model name for easier filtering, grouping, and display in admin UIs.
+
+Generated permission enums already include the `HasPermissionGroup` trait. By default, that trait derives the group name from the enum class name by removing the `Permission` suffix, so `UserPermission` becomes `User`, `PostPermission` becomes `Post`, and so on.
 
 ## Usage
 
@@ -230,7 +237,7 @@ class UserPolicy
 
 ### Permission Groups
 
-When `sync_permission_group` is enabled in the config, permissions will be grouped by model name, which is helpful for UI-based permission management:
+When `sync_permission_group` is enabled in the config, permissions will be grouped by model name and stored in the `group` column added by the published `enum-permission-migrations` migration. Generated enums already use `HasPermissionGroup`, which makes grouping work out of the box:
 
 ```php
 // In UserPermission.php
@@ -240,7 +247,7 @@ public static function getPermissionGroup(): string
 }
 ```
 
-This feature uses the `group` column added to the `permissions` table by this package's migration. The permissions are grouped automatically during the sync process:
+This feature uses the `group` column added to the `permissions` table by this package's migration. During `permission:sync`, the package calls `getPermissionGroup()` and stores the returned value in that column:
 
 ```php
 // Example of how permissions are stored with groups
