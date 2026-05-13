@@ -148,6 +148,58 @@ enum TestModelPermission: string {
     $this->assertDatabaseMissing('permissions', ['name' => 'test.permission']);
 });
 
+it('handles clean option with uuid primary key', function () {
+    // Create test permission file
+    $permissionsDir = app_path('Permissions');
+    if (! File::exists($permissionsDir)) {
+        File::makeDirectory($permissionsDir, 0755, true);
+    }
+
+    File::put(app_path('Permissions/TestModelPermission.php'), '<?php
+namespace App\Permissions;
+use Althinect\EnumPermission\Concerns\HasPermissionGroup;
+enum TestModelPermission: string {
+    use HasPermissionGroup;
+    case VIEW = "TestModel.view";
+    case CREATE = "TestModel.create";
+}');
+
+    // Create some test permissions first
+    Permission::create(['name' => 'test.permission', 'guard_name' => 'web']);
+
+    // Verify permission exists
+    $this->assertDatabaseHas('permissions', ['name' => 'test.permission']);
+
+    // Simulate a UUID primary key by binding a permission model with non-incrementing key
+    $nonIncrementingModel = new Permission;
+    $nonIncrementingModel->incrementing = false;
+    $this->app->singleton(
+        config('permission.models.permission', Permission::class),
+        fn () => $nonIncrementingModel
+    );
+
+    // Mock the service
+    $this->mock(EnumPermissionService::class, function (MockInterface $mock) {
+        $mock->shouldReceive('syncPermissionEnumToDatabase')
+            ->once()
+            ->with('App\\Permissions\\TestModelPermission')
+            ->andReturn([
+                'success' => true,
+                'message' => 'Successfully synced 2 permissions for App\\Permissions\\TestModelPermission',
+                'count' => 2,
+            ]);
+    });
+
+    // Run the sync command with clean option - should succeed without trying to reset a sequence
+    $this->artisan(SyncPermissionCommand::class, ['--clean' => true, '--force' => true])
+        ->expectsOutput('Syncing Permissions...')
+        ->expectsOutput('All permissions have been removed from the database')
+        ->assertExitCode(0);
+
+    // Verify permissions were cleaned
+    $this->assertDatabaseMissing('permissions', ['name' => 'test.permission']);
+});
+
 it('handles custom path option', function () {
     // Create a custom path for testing
     $customPath = base_path('custom/permissions');

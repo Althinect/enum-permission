@@ -6,6 +6,7 @@ use Althinect\EnumPermission\Concerns\Helpers;
 use Althinect\EnumPermission\Services\EnumPermissionService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 
 use function Laravel\Prompts\select;
 
@@ -61,12 +62,15 @@ class SyncPermissionCommand extends Command
             try {
                 DB::table('permissions')->delete();
 
-                // Use a database-agnostic approach to reset IDs
-                $driver = DB::connection()->getDriverName();
-                if ($driver === 'pgsql') {
-                    DB::statement('ALTER SEQUENCE permissions_id_seq RESTART WITH 1;');
-                } elseif ($driver === 'mysql' || $driver === 'mariadb') {
-                    DB::statement('ALTER TABLE permissions AUTO_INCREMENT = 1;');
+                // Only reset the auto-increment sequence for integer primary keys
+                $permissionModel = app(config('permission.models.permission', Permission::class));
+                if ($permissionModel->getIncrementing()) {
+                    $driver = DB::connection()->getDriverName();
+                    if ($driver === 'pgsql') {
+                        DB::statement('ALTER SEQUENCE permissions_id_seq RESTART WITH 1;');
+                    } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                        DB::statement('ALTER TABLE permissions AUTO_INCREMENT = 1;');
+                    }
                 }
 
                 $this->info('All permissions have been removed from the database');
