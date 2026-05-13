@@ -2,6 +2,21 @@
 
 All notable changes to `enum-permission` will be documented in this file.
 
+## v1.1.1 - 2026-05-13
+
+### What's Changed
+
+* Bump ramsey/composer-install from 3 to 4 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/28
+* Bump dependabot/fetch-metadata from 2.5.0 to 3.0.0 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/29
+* Bump dependabot/fetch-metadata from 3.0.0 to 3.1.0 by @dependabot[bot] in https://github.com/Althinect/enum-permission/pull/30
+* Fix --clean crash when permissions table uses UUID primary key by @Copilot in https://github.com/Althinect/enum-permission/pull/32
+
+### New Contributors
+
+* @Copilot made their first contribution in https://github.com/Althinect/enum-permission/pull/32
+
+**Full Changelog**: https://github.com/Althinect/enum-permission/compare/v1.1...v1.1.1
+
 ## Laravel 13 support - 2026-03-20
 
 **Full Changelog**: https://github.com/Althinect/enum-permission/commits/v1.1
