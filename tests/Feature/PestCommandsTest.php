@@ -170,16 +170,12 @@ enum TestModelPermission: string {
     // Verify permission exists
     $this->assertDatabaseHas('permissions', ['name' => 'test.permission']);
 
-    // Simulate a UUID primary key by binding a non-incrementing permission model
+    // Simulate a UUID primary key by binding a permission model with non-incrementing key
+    $nonIncrementingModel = new Permission;
+    $nonIncrementingModel->incrementing = false;
     $this->app->singleton(
         config('permission.models.permission', Permission::class),
-        function () {
-            return Mockery::mock(Permission::class)
-                ->shouldIgnoreMissing()
-                ->shouldReceive('getIncrementing')
-                ->andReturn(false)
-                ->getMock();
-        }
+        fn () => $nonIncrementingModel
     );
 
     // Mock the service
