@@ -6,6 +6,7 @@ use Althinect\EnumPermission\Concerns\Helpers;
 use Althinect\EnumPermission\Services\EnumPermissionService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 
 use function Laravel\Prompts\select;
 
@@ -62,7 +63,7 @@ class SyncPermissionCommand extends Command
                 DB::table('permissions')->delete();
 
                 // Only reset the auto-increment sequence for integer primary keys
-                $permissionModel = app(config('permission.models.permission', \Spatie\Permission\Models\Permission::class));
+                $permissionModel = app(config('permission.models.permission', Permission::class));
                 if ($permissionModel->getIncrementing()) {
                     $driver = DB::connection()->getDriverName();
                     if ($driver === 'pgsql') {
