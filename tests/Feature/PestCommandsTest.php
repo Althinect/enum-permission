@@ -174,10 +174,10 @@ enum TestModelPermission: string {
     $this->app->bind(
         config('permission.models.permission', Permission::class),
         function () {
-            $model = new Permission;
-            $model->incrementing = false;
+            $mock = Mockery::mock(Permission::class)->makePartial();
+            $mock->shouldReceive('getIncrementing')->andReturn(false);
 
-            return $model;
+            return $mock;
         }
     );
 
